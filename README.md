@@ -9,7 +9,11 @@ https://github.com/tamton-aquib/nvim-market/assets/77913442/ebb5a354-d767-4e0c-8
 { 'tamton-aquib/nvim-market', import="nvim-market.plugins" },
 ```
 ### Configuration
-*No config options as of now*
+```lua
+-- These keybinds should only be used inside lazy window.
+map('n', '<leader>ii', function() require("nvim-market").install_picker() end)
+map('n', '<leader>iu', function() require("nvim-market").remove_picker() end)
+```
 
 ### NOTE
 - The code is extremely ugly (Just nearly 200 LOC).
