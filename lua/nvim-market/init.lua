@@ -107,7 +107,7 @@ local search_plugins = function()
     gline = line
 end
 
-local picker_base = function()
+local picker_base = function(act)
     ---@diagnostic disable-next-line: undefined-field
     if not vim.uv.fs_stat(lua_path) then
         actions.set_plugins()
@@ -119,9 +119,12 @@ local picker_base = function()
     win = vim.api.nvim_open_win(buf, true, {
         relative='win', style='minimal', -- anchor="NE",
         width=w,
-        height=vim.api.nvim_win_get_height(0) - 5,
-        row=4, col=w
+        border='solid',
+        height=vim.api.nvim_win_get_height(0) - 6,
+        row=4, col=w, title=act.." Plugins",
     })
+    vim.keymap.set('n', '<Esc>', '<CMD>q<CR>', {buffer=buf})
+    vim.keymap.set('n', 'q', '<CMD>q<CR>', {buffer=buf})
 end
 
 M.install_picker = function()
@@ -129,7 +132,7 @@ M.install_picker = function()
         vim.print("Not in lazy window")
         return
     end
-    picker_base()
+    picker_base("Install")
     vim.api.nvim_buf_set_extmark(0, ns, 0, 0, { sign_text = " ", sign_hl_group = "Function" })
     vim.api.nvim_buf_add_highlight(buf, ns, "Keyword", 0, 0, -1)
     vim.keymap.set({"i", "n"}, "<CR>", install_selected_plugin, { buffer=buf })
@@ -141,7 +144,7 @@ M.remove_picker = function()
         vim.print("Not in lazy window")
         return
     end
-    picker_base()
+    picker_base("Remove")
     vim.schedule_wrap(function() vim.wo[win].winbar = "%#Keyword#Installed:" end)
     vim.api.nvim_buf_add_highlight(buf, ns, "Keyword", 0, 0, -1)
 
