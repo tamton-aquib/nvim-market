@@ -156,5 +156,12 @@ M.remove_picker = function()
     vim.keymap.set({"i", "n"}, "<CR>", remove_selected_plugin, { buffer=buf })
 end
 
+M.setup = function()
+    ---@diagnostic disable-next-line: undefined-field
+    if not vim.uv.fs_stat(lua_path) then
+        actions.set_plugins()
+    end
+    plugin_list = actions.get_plugins()
+end
 
 return M

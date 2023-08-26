@@ -6,7 +6,11 @@ https://github.com/tamton-aquib/nvim-market/assets/77913442/ebb5a354-d767-4e0c-8
 
 ### Installation
 ```lua
-{ 'tamton-aquib/nvim-market', import="nvim-market.plugins" },
+{
+    'tamton-aquib/nvim-market',
+    import="nvim-market.plugins",       -- Important part!
+    config=true     -- No real options as of now.
+},
 ```
 ### Configuration
 ```lua
