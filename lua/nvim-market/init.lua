@@ -18,7 +18,7 @@ local actions = {
             file:close()
             return vim.json.decode(content)
         else
-            error("Error in get_plugins!")
+            error("[nvim-market] Error in get_plugins!")
         end
     end,
 
@@ -29,7 +29,7 @@ local actions = {
             file:write(decoded)
             file:close()
         else
-            error("Error writing to file!")
+            error("[nvim-market] Error writing to file!")
         end
     end
 }
@@ -100,7 +100,7 @@ local search_plugins = function()
     end
 
     local s = Spinner.start(buf, ns, 0, 0)
-    curl.get("https://api.nvimplugnplay.repl.co/search?max_count=10&query="..line, {
+    curl.get("https://nvim-market.cyclic.app/search?max_count=10&query="..line, {
         callback=function(d) update_lines(d, s) end
     })
 
