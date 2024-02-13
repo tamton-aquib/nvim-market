@@ -10,29 +10,29 @@ local curl = require("plenary.curl")
 local lua_path = vim.fn.stdpath("data") .. "/plugins.json"
 local Spinner = require("nvim-market.spinner")
 
-local actions = {
-    get_plugins = function()
-        local file = io.open(lua_path, "r")
-        if file then
-            local content = file:read("*a")
-            file:close()
-            return vim.json.decode(content)
-        else
-            error("[nvim-market] Error in get_plugins!")
-        end
-    end,
-
-    set_plugins = function()
-        local file = io.open(lua_path, 'w')
-        if file then
-            local decoded = vim.fn.json_encode(plugin_list)
-            file:write(decoded)
-            file:close()
-        else
-            error("[nvim-market] Error writing to file!")
-        end
-    end
-}
+-- local actions = {
+    -- get_plugins = function()
+        -- local file = io.open(lua_path, "r")
+        -- if file then
+            -- local content = file:read("*a")
+            -- file:close()
+            -- return vim.json.decode(content)
+        -- else
+            -- error("[nvim-market] Error in get_plugins!")
+        -- end
+    -- end,
+-- 
+    -- set_plugins = function()
+        -- local file = io.open(lua_path, 'w')
+        -- if file then
+            -- local decoded = vim.fn.json_encode(plugin_list)
+            -- file:write(decoded)
+            -- file:close()
+        -- else
+            -- error("[nvim-market] Error writing to file!")
+        -- end
+    -- end
+-- }
 
 local update_lazy_window = function(dir, plug)
     require("lazy.core.plugin").load()
@@ -68,18 +68,30 @@ local install_selected_plugin = function()
     local result = vim.trim(vim.api.nvim_get_current_line())
     local selected = plugin_lines[result].full_name
 
-    local ps = actions.get_plugins()
-    for _, line in ipairs(ps) do
-        local matched = line:match("'"..vim.pesc(selected).."'")
-        if matched then
-            vim.notify("Plugin already exists!")
-            return
-        end
+    local rocks = require("rocks.api").get_user_rocks()
+    local found = vim.iter(rocks):any(function(_, v) return v["git"] == selected end)
+    if not found then
+        require("rocks-git.operations").install(
+            function() end,
+            function() end,
+            {
+                url = selected,
+            }
+        )
     end
 
-    plugin_list[selected] = {config=true}
-    actions.set_plugins()
-    update_lazy_window("install", result)
+    -- local ps = actions.get_plugins()
+    -- for _, line in ipairs(ps) do
+        -- local matched = line:match("'"..vim.pesc(selected).."'")
+        -- if matched then
+            -- vim.notify("Plugin already exists!")
+            -- return
+        -- end
+    -- end
+
+    -- plugin_list[selected] = {config=true}
+    -- actions.set_plugins()
+    -- update_lazy_window("install", result)
 end
 
 local update_lines = function(d, s)
@@ -109,9 +121,9 @@ end
 
 local picker_base = function(act)
     ---@diagnostic disable-next-line: undefined-field
-    if not vim.uv.fs_stat(lua_path) then
-        actions.set_plugins()
-    end
+    -- if not vim.uv.fs_stat(lua_path) then
+        -- actions.set_plugins()
+    -- end
 
     buf = vim.api.nvim_create_buf(false, true)
     vim.bo[buf].ft = "lazy_search"
@@ -128,10 +140,6 @@ local picker_base = function(act)
 end
 
 M.install_picker = function()
-    if vim.bo.ft ~= "lazy" then
-        vim.print("Not in lazy window")
-        return
-    end
     picker_base("Install")
     vim.api.nvim_buf_set_extmark(0, ns, 0, 0, { sign_text = " ", sign_hl_group = "Function" })
     vim.api.nvim_buf_add_highlight(buf, ns, "Keyword", 0, 0, -1)
