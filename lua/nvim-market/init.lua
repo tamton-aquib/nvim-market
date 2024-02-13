@@ -100,7 +100,7 @@ local search_plugins = function()
     end
 
     local s = Spinner.start(buf, ns, 0, 0)
-    curl.get("https://nvim-market.cyclic.app/search?max_count=10&query="..line, {
+    curl.get("https://nvim-market.onrender.com/search?max_count=10&query="..line, {
         callback=function(d) update_lines(d, s) end
     })
 
